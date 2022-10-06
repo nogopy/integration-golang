@@ -1,0 +1,29 @@
+version: "3.1"
+
+services:
+  mysql:
+    image: mysql
+    container_name: integration-golang-mysql-test
+    #    volumes:
+    #      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      - MYSQL_DATABASE=cake
+      - MYSQL_ROOT_PASSWORD=123456
+
+  web:
+    build: .
+    depends_on:
+      - mysql
+    restart: on-failure
+    container_name: integration-golang-server-test
+    links:
+      - mysql
+    environment:
+      - DB_HOST=integration-golang-mysql-test
+      - DB_PORT=3306
+      - DB_NAME=cake
+      - DB_USER=root
+      - DB_PASS=123456
+      - LOG_LEVEL=INFO
+      - PORT=8082
+      - ENV=testing
